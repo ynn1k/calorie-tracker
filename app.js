@@ -37,6 +37,17 @@ const ItemCtrl = (() => {
             data.items.push(newItem);
             return newItem;
         },
+        getTotalCalories: () => {
+            let total = 0;
+            //Loop all items and add calories
+            data.items.forEach((item) => {
+                total += item.calories;
+            });
+            //Set total calories in data
+            data.totalCalories = total;
+
+            return data.totalCalories
+        },
         logData: () => {
             return data;
         }
@@ -49,7 +60,8 @@ const UICtrl = (() => {
         itemList: document.querySelector('#item-list'),
         addBtn: document.querySelector('#add-btn'),
         itemNameInput: document.querySelector('#item-name'),
-        itemCaloriesInput: document.querySelector('#item-calories')
+        itemCaloriesInput: document.querySelector('#item-calories'),
+        totalCalories: document.querySelector('.total-calories'),
     };
 
     const listItemTemplate = (item) => {
@@ -90,6 +102,9 @@ const UICtrl = (() => {
             UISelectors.itemNameInput.value = '';
             UISelectors.itemCaloriesInput.value = '';
         },
+        showTotalCalories: (totalCalories) => {
+            UISelectors.totalCalories.textContent = totalCalories;
+        },
         getSelectors: () => {
             return UISelectors
         }
@@ -119,10 +134,13 @@ const App = ((ItemCtrl, UICtrl) => {
             const newItem = ItemCtrl.addItem(input.name, input.calories);
             //Add item to UI
             UICtrl.addListItem(newItem);
+            //Get total calories
+            const totalCalories = ItemCtrl.getTotalCalories();
+            //Update total calories count in UI
+            UICtrl.showTotalCalories(totalCalories);
             //Clear input
             UICtrl.clearInput();
         }
-
 
         e.preventDefault();
     };
@@ -134,6 +152,10 @@ const App = ((ItemCtrl, UICtrl) => {
             const items = ItemCtrl.getItems();
             //Populate list
             UICtrl.populateItemList(items);
+            //Get total calories
+            const totalCalories = ItemCtrl.getTotalCalories();
+            //Update total calories count in UI
+            UICtrl.showTotalCalories(totalCalories);
             //Load event listeners
             loadEventListeners();
         }
