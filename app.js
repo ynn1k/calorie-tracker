@@ -37,6 +37,22 @@ const ItemCtrl = (() => {
             data.items.push(newItem);
             return newItem;
         },
+        getItemById: (id) => {
+            let found = null;
+            //Loop through items
+            data.items.forEach((item) => {
+                if(item.id === id) {
+                    found = item;
+                }
+            });
+            return found;
+        },
+        setCurrentItem: (item) => {
+            data.currentItem = item;
+        },
+        getCurrentItem: () => {
+            return data.currentItem;
+        },
         getTotalCalories: () => {
             let total = 0;
             //Loop all items and add calories
@@ -59,6 +75,9 @@ const UICtrl = (() => {
     const UISelectors = {
         itemList: document.querySelector('#item-list'),
         addBtn: document.querySelector('#add-btn'),
+        updateBtn: document.querySelector('#update-btn'),
+        deleteBtn: document.querySelector('#delete-btn'),
+        backBtn: document.querySelector('#back-btn'),
         itemNameInput: document.querySelector('#item-name'),
         itemCaloriesInput: document.querySelector('#item-calories'),
         totalCalories: document.querySelector('.total-calories'),
@@ -102,8 +121,26 @@ const UICtrl = (() => {
             UISelectors.itemNameInput.value = '';
             UISelectors.itemCaloriesInput.value = '';
         },
+        addItemToForm: () => {
+            UISelectors.itemNameInput.value = ItemCtrl.getCurrentItem().name;
+            UISelectors.itemCaloriesInput.value = ItemCtrl.getCurrentItem().calories;
+            UICtrl.showEditState();
+        },
         showTotalCalories: (totalCalories) => {
             UISelectors.totalCalories.textContent = totalCalories;
+        },
+        clearEditState: () => {
+            UICtrl.clearInput();
+            UISelectors.updateBtn.style.display = 'none';
+            UISelectors.deleteBtn.style.display = 'none';
+            UISelectors.backBtn.style.display = 'none';
+            UISelectors.addBtn.style.display = 'inline';
+        },
+        showEditState: () => {
+            UISelectors.updateBtn.style.display = 'inline';
+            UISelectors.deleteBtn.style.display = 'inline';
+            UISelectors.backBtn.style.display = 'inline';
+            UISelectors.addBtn.style.display = 'none';
         },
         getSelectors: () => {
             return UISelectors
@@ -120,6 +157,9 @@ const App = ((ItemCtrl, UICtrl) => {
 
         //Add item event
         UISelectors.addBtn.addEventListener('click', itemAddSubmit);
+
+        //Edit icon click event
+        UISelectors.itemList.addEventListener('click', itemUpdateSubmit)
     };
 
     //Add item submit
@@ -144,10 +184,32 @@ const App = ((ItemCtrl, UICtrl) => {
 
         e.preventDefault();
     };
+    
+    //Update item submit
+    const itemUpdateSubmit = (e) => {
+        if(e.target.classList.contains('edit-item')) {
+            //Get list item id
+            const listItemId = e.target.parentNode.parentNode.id;
+            //Break into an array
+            const listItemIdArr = listItemId.split('-');
+            //Get the actual id
+            const id = parseInt(listItemIdArr[1]);
+            //Get item
+            const itemToEdit = ItemCtrl.getItemById(id);
+            //Set current item
+            ItemCtrl.setCurrentItem(itemToEdit);
+            //Add item to form
+            UICtrl.addItemToForm();
+        }
+
+        e.preventDefault();  
+    };
 
     return {
         init: () => {
             console.log("InitApp...");
+            //Set initial edit state
+            UICtrl.clearEditState();
             //Get items from data src
             const items = ItemCtrl.getItems();
             //Populate list
