@@ -1,4 +1,46 @@
 //Storage Controlle
+const StorageCtrl = (() => {
+    return {
+        storeItem: (item) => {
+            let items = [];
+            //Check if any items in localstorage
+            if(localStorage.getItem('items') !== null) {
+                items = JSON.parse(localStorage.getItem('items'));
+            }
+            items.push(item);
+            //Set to localstorage
+            localStorage.setItem('items', JSON.stringify(items));
+        },
+        getItemsFromStorage: () => {
+            let items = [];
+            if(localStorage.getItem('items') !== null) {
+                items = JSON.parse(localStorage.getItem('items'));
+            }
+            return items;
+        },
+        updateItemStorage: (updatedItem) => {
+            let items = JSON.parse(localStorage.getItem('items'));
+            items.forEach((item, index) => {
+                if(updatedItem.id === item.id) {
+                    items.splice(index, 1, updatedItem);
+                }
+            });
+            localStorage.setItem('items', JSON.stringify(items));
+        },
+        deleteItemFromStorage: (id) => {
+            let items = JSON.parse(localStorage.getItem('items'));
+            items.forEach((item, index) => {
+                if(id === item.id) {
+                    items.splice(index, 1);
+                }
+            });
+            localStorage.setItem('items', JSON.stringify(items));
+        },
+        clearItemsFromStorage: () => {
+            localStorage.removeItem('items');
+        }
+    }
+})();
 
 //Item Controller
 const ItemCtrl = (() => {
@@ -11,7 +53,7 @@ const ItemCtrl = (() => {
 
     //Data Structure / State
     const data = {
-        items: [],
+        items: StorageCtrl.getItemsFromStorage(),
         currentItem: null,
         totalCalories: 0
     };
@@ -209,7 +251,7 @@ const UICtrl = (() => {
 })();
 
 //App Controller
-const App = ((ItemCtrl, UICtrl) => {
+const App = ((ItemCtrl, StorageCtrl, UICtrl) => {
     //Load event listeners
     const loadEventListeners = () => {
         //Get UI selectors
@@ -258,6 +300,8 @@ const App = ((ItemCtrl, UICtrl) => {
             const totalCalories = ItemCtrl.getTotalCalories();
             //Update total calories count in UI
             UICtrl.showTotalCalories(totalCalories);
+            //Store item in localstorage
+            StorageCtrl.storeItem(newItem);
             //Clear input
             UICtrl.clearInput();
         }
@@ -297,6 +341,8 @@ const App = ((ItemCtrl, UICtrl) => {
         const totalCalories = ItemCtrl.getTotalCalories();
         //Update total calories count in UI
         UICtrl.showTotalCalories(totalCalories);
+        //Update localstorage
+        StorageCtrl.updateItemStorage(updatedItem);
 
         UICtrl.clearEditState();
 
@@ -315,6 +361,8 @@ const App = ((ItemCtrl, UICtrl) => {
         const totalCalories = ItemCtrl.getTotalCalories();
         //Update total calories count in UI
         UICtrl.showTotalCalories(totalCalories);
+        //Delete from localstorage
+        StorageCtrl.deleteItemFromStorage(currentItem.id);
 
         UICtrl.clearEditState();
 
@@ -331,6 +379,8 @@ const App = ((ItemCtrl, UICtrl) => {
         UICtrl.showTotalCalories(totalCalories);
         //Remove from UI
         UICtrl.removeAllItems();
+        //Clear from localstorage
+        StorageCtrl.clearItemsFromStorage();
     };
 
     return {
@@ -350,7 +400,7 @@ const App = ((ItemCtrl, UICtrl) => {
             loadEventListeners();
         }
     }
-})(ItemCtrl, UICtrl);
+})(ItemCtrl, StorageCtrl, UICtrl);
 
 //Init App
 App.init();
