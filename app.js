@@ -47,6 +47,20 @@ const ItemCtrl = (() => {
             });
             return found;
         },
+        updaItem: (name, calories) => {
+            //calories to number
+            calories = parseInt(calories);
+
+            let found = null;
+            data.items.forEach((item) => {
+                if(item.id === data.currentItem.id) {
+                    item.name = name;
+                    item.calories = calories;
+                    found = item;
+                }
+            });
+            return found;
+        },
         setCurrentItem: (item) => {
             data.currentItem = item;
         },
@@ -74,6 +88,8 @@ const ItemCtrl = (() => {
 const UICtrl = (() => {
     const UISelectors = {
         itemList: document.querySelector('#item-list'),
+        listItems: document.querySelectorAll('#item-list li'), //not working because the li's get generated afterwards...
+        listItems: '#item-list li', //...so we will use this
         addBtn: document.querySelector('#add-btn'),
         updateBtn: document.querySelector('#update-btn'),
         deleteBtn: document.querySelector('#delete-btn'),
@@ -115,7 +131,26 @@ const UICtrl = (() => {
             //Create li element
             const li = listItemTemplate(item);
             //Insert item
-            UISelectors.itemList.insertAdjacentHTML('beforeend',li)
+            UISelectors.itemList.insertAdjacentHTML('beforeend',li);
+        },
+        updateListItem: (item) => {
+            let listItems = document.querySelectorAll(UISelectors.listItems);
+            //Turn node list into array
+            listItems = Array.from(listItems);
+            listItems.forEach((listItem) => {
+                const itemID = listItem.getAttribute('id');
+                if(itemID === `item-${item.id}`) {
+                    //Select element that will be replaced
+                    let outdatedItem = document.querySelector(`#${itemID}`);
+                    //Create a new ul wrapper
+                    let updatedItem = document.createElement('ul');
+                    //Generate the actual replacer item
+                    updatedItem.innerHTML = listItemTemplate(item);
+                    updatedItem = updatedItem.childNodes[1];
+                    //Replace outdated with the firs child of updatedItem
+                    outdatedItem.parentNode.replaceChild(updatedItem, outdatedItem);
+                }
+            });
         },
         clearInput: () => {
             UISelectors.itemNameInput.value = '';
@@ -157,9 +192,20 @@ const App = ((ItemCtrl, UICtrl) => {
 
         //Add item event
         UISelectors.addBtn.addEventListener('click', itemAddSubmit);
+        
+        //Disable submit on enter
+        document.addEventListener('keypress',(e) => {
+            if(e.code === "Enter") {
+                e.preventDefault();
+                return false;
+            }
+        });
 
         //Edit icon click event
-        UISelectors.itemList.addEventListener('click', itemUpdateSubmit)
+        UISelectors.itemList.addEventListener('click', itemEditClick);
+        
+        //Update item event
+        UISelectors.updateBtn.addEventListener('click', itemUpdateSubmit);
     };
 
     //Add item submit
@@ -185,8 +231,8 @@ const App = ((ItemCtrl, UICtrl) => {
         e.preventDefault();
     };
     
-    //Update item submit
-    const itemUpdateSubmit = (e) => {
+    //CLick edit item
+    const itemEditClick = (e) => {
         if(e.target.classList.contains('edit-item')) {
             //Get list item id
             const listItemId = e.target.parentNode.parentNode.id;
@@ -203,6 +249,24 @@ const App = ((ItemCtrl, UICtrl) => {
         }
 
         e.preventDefault();  
+    };
+    
+    //Update item submit
+    const itemUpdateSubmit = (e) => {
+        //Get item input
+        const input = UICtrl.getItemInput();
+        //Update item
+        const updatedItem = ItemCtrl.updaItem(input.name, input.calories);
+        //Update UI
+        UICtrl.updateListItem(updatedItem);
+        //Get total calories
+        const totalCalories = ItemCtrl.getTotalCalories();
+        //Update total calories count in UI
+        UICtrl.showTotalCalories(totalCalories);
+
+        UICtrl.clearEditState();
+
+        e.preventDefault();
     };
 
     return {
