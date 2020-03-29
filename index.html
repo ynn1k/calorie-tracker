@@ -12,42 +12,65 @@
         Calorie Tracker
     </title>
 </head>
-<body>
-    <div class="container">
+<body class="bg-dark">
+    <div class="container my-5">
         <div class="row">
-            <div class="col-12">
-                <a href="#" class="btn btn-primary clear-btn">Clear All</a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="input-wrapper col-6">
-                <label for="item-name">Meal</label>
-                <input type="text" placeholder="Add item" id="item-name">
-            </div>
-            <div class="input-wrapper col-6">
-                <label for="item-name">Calories</label>
-                <input type="number" placeholder="Add calories" id="item-calories">
-            </div>
-            <div class="col-12">
-                <button class="btn btn-primary" id="add-btn"><i class="fa fa-plus"></i> Add meal</button>
-                <button class="btn btn-primary" id="update-btn"><i class="fa fa-pencil-square-o"></i> Update meal</button>
-                <button class="btn btn-primary" id="delete-btn"><i class="fa fa-remove"></i> Delete meal</button>
-                <button class="btn btn-primary" id="back-btn"><i class="fa fa-chevron-circle-left"></i> Back</button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <hr>
-                <h2 class="text-center">Total calories: <span class="total-calories">0</span></h2>
-                <hr>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <ul id="item-list" class="list-group list-group-flush"></ul>
+            <div class="col-12 col-md-8 col-lg-6 mx-auto">
+                <div class="row bg-light shadow-lg rounded-lg border py-3 mb-5">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label for="item-name">Meal:</label>
+                            <input type="text" class="form-control" id="item-name" placeholder="Enter meal">
+                            <small class="form-text text-muted">What have you eaten today?</small>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group">
+                            <label for="item-calories">Calories:</label>
+                            <input type="number" class="form-control" id="item-calories" placeholder="Exact calories">
+                            <small class="form-text text-muted">For sure you know the calorie count.</small>
+                        </div>
+                    </div>
+                    <div class="col-12 d-flex">
+                        <button class="btn btn-primary ml-auto" id="add-btn"><i class="fa fa-plus"></i> Add meal</button>
+                        <button class="btn btn-secondary mr-auto" id="back-btn"><i class="fa fa-chevron-circle-left"></i> Back</button>
+                        <button class="btn btn-primary ml-5" id="update-btn"><i class="fa fa-pencil-square-o"></i> Update meal</button>
+                        <button class="btn btn-danger ml-3" id="delete-btn"><i class="fa fa-remove"></i> Delete meal</button>
+                    </div>
+                </div>
+
+                <div class="row bg-light shadow-lg rounded-lg mb-3">
+                    <div class="col-12">
+                        <hr>
+                        <div class="progress" style="height: 32px">
+                            <div class="progress-bar progress-bar-striped bg-info" role="progressbar" data-toggle="tooltip" data-placement="top" title="Tooltip on top" style="width: 50%">
+                                <span>
+                                    Total calories: <span class="total-calories">0</span> / 2500
+                                </span>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 d-flex flex-column">
+                        <a href="#" class="badge badge-danger clear-btn ml-auto my-2" title="Remove all entries">Clear...</a>
+                        <ul id="item-list" class="list-group list-group-flush rounded-lg overflow-auto"></ul>
+                    </div>
+                </div>
+
+                <div class="row mt-5">
+                    <div class="col-12 text-center mt-5">
+                        <small>
+                            <a href="https://www.udemy.com/share/101Wqk/" target="_blank" class="text-info">It's part of Brad's awesome js course!</a>
+                        </small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>

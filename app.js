@@ -140,24 +140,25 @@ const ItemCtrl = (() => {
 //UI Controller
 const UICtrl = (() => {
     const UISelectors = {
-        itemList: document.querySelector('#item-list'),
-        listItems: document.querySelectorAll('#item-list li'), //not working because the li's get generated afterwards...
-        listItems: '#item-list li', //...so we will use this
-        addBtn: document.querySelector('#add-btn'),
-        updateBtn: document.querySelector('#update-btn'),
-        deleteBtn: document.querySelector('#delete-btn'),
-        backBtn: document.querySelector('#back-btn'),
-        clearBtn: document.querySelector('.clear-btn'),
-        itemNameInput: document.querySelector('#item-name'),
-        itemCaloriesInput: document.querySelector('#item-calories'),
-        totalCalories: document.querySelector('.total-calories'),
+        itemList:           document.querySelector('#item-list'),
+        listItems:          document.querySelectorAll('#item-list li'), //not working because the li's get generated afterwards...
+        listItems:          '#item-list li', //...so we will use this
+        addBtn:             document.querySelector('#add-btn'),
+        updateBtn:          document.querySelector('#update-btn'),
+        deleteBtn:          document.querySelector('#delete-btn'),
+        backBtn:            document.querySelector('#back-btn'),
+        clearBtn:           document.querySelector('.clear-btn'),
+        itemNameInput:      document.querySelector('#item-name'),
+        itemCaloriesInput:  document.querySelector('#item-calories'),
+        totalCalories:      document.querySelector('.total-calories'),
+        progressbar:        document.querySelector('.progress-bar')
     };
 
     const listItemTemplate = (item) => {
         return `
-            <li class="list-group-item" id="item-${item.id}">
-                <strong>${item.name}:</strong> <em>${item.calories} calories</em>
-                <a href="#">
+            <li class="list-group-item d-flex justify-content-between list-group-item-light" id="item-${item.id}">
+                <strong>${item.name}</strong> <em>${item.calories} calories</em>
+                <a href="#" title="Edit entry">
                     <i class="fa fa-pencil edit-item"></i>
                 </a>
             </li>
@@ -230,6 +231,21 @@ const UICtrl = (() => {
         },
         showTotalCalories: (totalCalories) => {
             UISelectors.totalCalories.textContent = totalCalories;
+
+            const maxCalories = 2500; //roughly based on a 25y 180cm male
+            const progress = (totalCalories / maxCalories) * 100; //Total percentage of daily calories
+
+            if(progress >= 90) {
+                UISelectors.progressbar.classList.add('bg-danger');
+                UISelectors.progressbar.classList.remove('bg-warning');
+            } else if(progress >= 66) {
+                UISelectors.progressbar.classList.remove('bg-danger');
+                UISelectors.progressbar.classList.add('bg-warning');
+            } else {
+                UISelectors.progressbar.classList.remove('bg-danger');
+                UISelectors.progressbar.classList.remove('bg-warning');
+            }
+            UISelectors.progressbar.style.width = progress+"%";
         },
         clearEditState: () => {
             UICtrl.clearInput();
@@ -371,16 +387,18 @@ const App = ((ItemCtrl, StorageCtrl, UICtrl) => {
 
     //Clear items event
     const clearAllItems = () => {
-        //Delete all items from data structure
-        ItemCtrl.clearAllItems();
-        //Get total calories
-        const totalCalories = ItemCtrl.getTotalCalories();
-        //Update total calories count in UI
-        UICtrl.showTotalCalories(totalCalories);
-        //Remove from UI
-        UICtrl.removeAllItems();
-        //Clear from localstorage
-        StorageCtrl.clearItemsFromStorage();
+        if(confirm("You want to remove all entries?")) {
+            //Delete all items from data structure
+            ItemCtrl.clearAllItems();
+            //Get total calories
+            const totalCalories = ItemCtrl.getTotalCalories();
+            //Update total calories count in UI
+            UICtrl.showTotalCalories(totalCalories);
+            //Remove from UI
+            UICtrl.removeAllItems();
+            //Clear from localstorage
+            StorageCtrl.clearItemsFromStorage();
+        }
     };
 
     return {
