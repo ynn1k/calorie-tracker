@@ -69,6 +69,9 @@ const ItemCtrl = (() => {
             //Remove item
             data.items.splice(index, 1)
         },
+        clearAllItems: () => {
+            data.items = [];
+        },
         setCurrentItem: (item) => {
             data.currentItem = item;
         },
@@ -102,6 +105,7 @@ const UICtrl = (() => {
         updateBtn: document.querySelector('#update-btn'),
         deleteBtn: document.querySelector('#delete-btn'),
         backBtn: document.querySelector('#back-btn'),
+        clearBtn: document.querySelector('.clear-btn'),
         itemNameInput: document.querySelector('#item-name'),
         itemCaloriesInput: document.querySelector('#item-calories'),
         totalCalories: document.querySelector('.total-calories'),
@@ -174,6 +178,14 @@ const UICtrl = (() => {
             UISelectors.itemCaloriesInput.value = ItemCtrl.getCurrentItem().calories;
             UICtrl.showEditState();
         },
+        removeAllItems: () => {
+            let listItems = document.querySelectorAll(UISelectors.listItems);
+            //Turn node list into array
+            listItems = Array.from(listItems);
+            listItems.forEach((item) => {
+                item.remove();
+            });
+        },
         showTotalCalories: (totalCalories) => {
             UISelectors.totalCalories.textContent = totalCalories;
         },
@@ -225,6 +237,9 @@ const App = ((ItemCtrl, UICtrl) => {
 
         //Back button event
         UISelectors.backBtn.addEventListener('click', UICtrl.clearEditState);
+
+        //Clear items event
+        UISelectors.clearBtn.addEventListener('click', clearAllItems);
     };
 
     //Add item submit
@@ -304,6 +319,18 @@ const App = ((ItemCtrl, UICtrl) => {
         UICtrl.clearEditState();
 
         e.preventDefault();
+    };
+
+    //Clear items event
+    const clearAllItems = () => {
+        //Delete all items from data structure
+        ItemCtrl.clearAllItems();
+        //Get total calories
+        const totalCalories = ItemCtrl.getTotalCalories();
+        //Update total calories count in UI
+        UICtrl.showTotalCalories(totalCalories);
+        //Remove from UI
+        UICtrl.removeAllItems();
     };
 
     return {
