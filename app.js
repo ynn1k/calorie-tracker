@@ -1,7 +1,12 @@
+/*
+ * try keeping the logs up-to-date when making changes
+ */
+
 //Storage Controlle
 const StorageCtrl = (() => {
     return {
         storeItem: (item) => {
+            console.log("Push a new item to localstorage...", item);
             let items = [];
             //Check if any items in localstorage
             if(localStorage.getItem('items') !== null) {
@@ -16,9 +21,11 @@ const StorageCtrl = (() => {
             if(localStorage.getItem('items') !== null) {
                 items = JSON.parse(localStorage.getItem('items'));
             }
+            console.log("Getting item data from localstorage...", items);
             return items;
         },
         updateItemStorage: (updatedItem) => {
+            console.log("Updating saved data...", updatedItem);
             let items = JSON.parse(localStorage.getItem('items'));
             items.forEach((item, index) => {
                 if(updatedItem.id === item.id) {
@@ -28,6 +35,7 @@ const StorageCtrl = (() => {
             localStorage.setItem('items', JSON.stringify(items));
         },
         deleteItemFromStorage: (id) => {
+            console.log("Remove item from localstorage...", id);
             let items = JSON.parse(localStorage.getItem('items'));
             items.forEach((item, index) => {
                 if(id === item.id) {
@@ -37,6 +45,7 @@ const StorageCtrl = (() => {
             localStorage.setItem('items', JSON.stringify(items));
         },
         clearItemsFromStorage: () => {
+            console.log("Remove all items from localstorage...");
             localStorage.removeItem('items');
         }
     }
@@ -46,10 +55,11 @@ const StorageCtrl = (() => {
 const ItemCtrl = (() => {
     // Item Constructor
     const Item = function(id, name, calories){
+        console.log("Item constructor called...");
         this.id = id;
         this.name = name;
         this.calories = calories;
-    }
+    };
 
     //Data Structure / State
     const data = {
@@ -61,9 +71,11 @@ const ItemCtrl = (() => {
     //Public methods
     return {
         getItems: () => {
+            console.log("Returning all the items!...");
             return data.items;
         },
         addItem: (name, calories) => {
+            console.log("Adding a new Item...", name, calories);
             //Create ID
             let ID;
             if(data.items.length > 0) {
@@ -80,6 +92,7 @@ const ItemCtrl = (() => {
             return newItem;
         },
         getItemById: (id) => {
+            console.log("Looking for an item...", id);
             let found = null;
             //Loop through items
             data.items.forEach((item) => {
@@ -89,7 +102,8 @@ const ItemCtrl = (() => {
             });
             return found;
         },
-        updaItem: (name, calories) => {
+        updateItem: (name, calories) => {
+            console.log("Updating current item...", name, calories);
             //calories to number
             calories = parseInt(calories);
 
@@ -104,6 +118,7 @@ const ItemCtrl = (() => {
             return found;
         },
         deleteItem: (id) => {
+            console.log("Remove item data...", id);
             //Get ids
             const ids = data.items.map((item) => { return item.id });
             //Get index
@@ -112,12 +127,15 @@ const ItemCtrl = (() => {
             data.items.splice(index, 1)
         },
         clearAllItems: () => {
+            console.log("Clear all item data...");
             data.items = [];
         },
         setCurrentItem: (item) => {
+            console.log("Set new item as current item...", item);
             data.currentItem = item;
         },
         getCurrentItem: () => {
+            console.log("Getting current item...");
             return data.currentItem;
         },
         getTotalCalories: () => {
@@ -129,6 +147,7 @@ const ItemCtrl = (() => {
             //Set total calories in data
             data.totalCalories = total;
 
+            console.log("Calculating total calories...", total);
             return data.totalCalories
         },
         logData: () => {
@@ -155,6 +174,7 @@ const UICtrl = (() => {
     };
 
     const listItemTemplate = (item) => {
+        console.log("Generating li template from data...", item);
         return `
             <li class="list-group-item d-flex justify-content-between list-group-item-light" id="item-${item.id}">
                 <strong>${item.name}</strong> <em>${item.calories} calories</em>
@@ -168,6 +188,7 @@ const UICtrl = (() => {
     //Public methods
     return {
         populateItemList: (items) => {
+            console.log("Populating items...", items);
             let listItemHtml = '';
             items.forEach((item) => {
                 listItemHtml += listItemTemplate(item);
@@ -177,6 +198,7 @@ const UICtrl = (() => {
             UISelectors.itemList.innerHTML = listItemHtml;
         },
         getItemInput: () => {
+            console.log("Returning item name & calories", UISelectors.itemNameInput.value, UISelectors.itemCaloriesInput.value);
             return {
                 name: UISelectors.itemNameInput.value,
                 calories: UISelectors.itemCaloriesInput.value
@@ -187,6 +209,7 @@ const UICtrl = (() => {
             const li = listItemTemplate(item);
             //Insert item
             UISelectors.itemList.insertAdjacentHTML('beforeend',li);
+            console.log("Add item to list...", item, li);
         },
         updateListItem: (item) => {
             let listItems = document.querySelectorAll(UISelectors.listItems);
@@ -204,6 +227,7 @@ const UICtrl = (() => {
                     updatedItem = updatedItem.childNodes[1];
                     //Replace outdated with the firs child of updatedItem
                     outdatedItem.parentNode.replaceChild(updatedItem, outdatedItem);
+                    console.log("Updating list item...", updatedItem, outdatedItem);
                 }
             });
         },
@@ -211,25 +235,31 @@ const UICtrl = (() => {
             const itemID = `#item-${id}`;
             const item = document.querySelector(itemID);
             item.remove();
+            console.log("Removing item from list...", item);
         },
         clearInput: () => {
+            console.log("Clearing inputs...");
             UISelectors.itemNameInput.value = '';
             UISelectors.itemCaloriesInput.value = '';
         },
         addItemToForm: () => {
+            console.log("Pass item data to edit form...", ItemCtrl.getCurrentItem());
             UISelectors.itemNameInput.value = ItemCtrl.getCurrentItem().name;
             UISelectors.itemCaloriesInput.value = ItemCtrl.getCurrentItem().calories;
             UICtrl.showEditState();
         },
         removeAllItems: () => {
+            console.log("Removing alle items...");
             let listItems = document.querySelectorAll(UISelectors.listItems);
             //Turn node list into array
             listItems = Array.from(listItems);
             listItems.forEach((item) => {
+                console.log("Removing: ", item);
                 item.remove();
             });
         },
         showTotalCalories: (totalCalories) => {
+            console.log("Updating progressbar...", totalCalories);
             UISelectors.totalCalories.textContent = totalCalories;
 
             const maxCalories = 2500; //roughly based on a 25y 180cm male
@@ -238,6 +268,7 @@ const UICtrl = (() => {
             if(progress >= 90) {
                 UISelectors.progressbar.classList.add('bg-danger');
                 UISelectors.progressbar.classList.remove('bg-warning');
+                console.log("You'll get fat...");
             } else if(progress >= 66) {
                 UISelectors.progressbar.classList.remove('bg-danger');
                 UISelectors.progressbar.classList.add('bg-warning');
@@ -248,6 +279,7 @@ const UICtrl = (() => {
             UISelectors.progressbar.style.width = progress+"%";
         },
         clearEditState: () => {
+            console.log("Hide edit state...");
             UICtrl.clearInput();
             UISelectors.updateBtn.style.display = 'none';
             UISelectors.deleteBtn.style.display = 'none';
@@ -255,6 +287,7 @@ const UICtrl = (() => {
             UISelectors.addBtn.style.display = 'inline';
         },
         showEditState: () => {
+            console.log("Show edit state...");
             UISelectors.updateBtn.style.display = 'inline';
             UISelectors.deleteBtn.style.display = 'inline';
             UISelectors.backBtn.style.display = 'inline';
@@ -270,6 +303,7 @@ const UICtrl = (() => {
 const App = ((ItemCtrl, StorageCtrl, UICtrl) => {
     //Load event listeners
     const loadEventListeners = () => {
+        console.log("Applying event listeners...");
         //Get UI selectors
         const UISelectors = UICtrl.getSelectors();
 
@@ -302,13 +336,12 @@ const App = ((ItemCtrl, StorageCtrl, UICtrl) => {
 
     //Add item submit
     const itemAddSubmit = (e) => {
+        console.log("Trying to add an item...");
         //Get form input from UI Controller
         const input = UICtrl.getItemInput();
         //check input
         if(input.name !== '' && input.calories !== '') {
-            console.log("Add item");
-            console.log(input);
-            console.log(input.name, input.calories);
+            console.log("Adding item...", input);
             const newItem = ItemCtrl.addItem(input.name, input.calories);
             //Add item to UI
             UICtrl.addListItem(newItem);
@@ -338,6 +371,7 @@ const App = ((ItemCtrl, StorageCtrl, UICtrl) => {
             const itemToEdit = ItemCtrl.getItemById(id);
             //Set current item
             ItemCtrl.setCurrentItem(itemToEdit);
+            console.log("Start editing item...", itemToEdit);
             //Add item to form
             UICtrl.addItemToForm();
         }
@@ -347,10 +381,11 @@ const App = ((ItemCtrl, StorageCtrl, UICtrl) => {
     
     //Update item submit
     const itemUpdateSubmit = (e) => {
+        console.log("Submit edits...");
         //Get item input
         const input = UICtrl.getItemInput();
         //Update item
-        const updatedItem = ItemCtrl.updaItem(input.name, input.calories);
+        const updatedItem = ItemCtrl.updateItem(input.name, input.calories);
         //Update UI
         UICtrl.updateListItem(updatedItem);
         //Get total calories
@@ -369,6 +404,7 @@ const App = ((ItemCtrl, StorageCtrl, UICtrl) => {
     const itemDeleteSubmit = (e) => {
         //Get current item
         const currentItem = ItemCtrl.getCurrentItem();
+        console.log("Deleting item...", currentItem);
         //Delete from data structure
         ItemCtrl.deleteItem(currentItem.id);
         //Delete from UI
@@ -387,6 +423,7 @@ const App = ((ItemCtrl, StorageCtrl, UICtrl) => {
 
     //Clear items event
     const clearAllItems = () => {
+        console.log("Waiting for confirmation to delete all items...");
         if(confirm("You want to remove all entries?")) {
             //Delete all items from data structure
             ItemCtrl.clearAllItems();
